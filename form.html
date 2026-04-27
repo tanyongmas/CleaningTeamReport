@@ -59,7 +59,7 @@
         <div class="header">
             <img src="https://img2.pic.in.th/pic/71f81565dc59a7f9545542493a5514ab.png" alt="โลโก้เทศบาล" class="form-logo">
             <h2>เทศบาลตำบลตันหยงมัส</h2>
-            <small class="text-muted">ระบบรายงานปฏิบัติงานของพนักงานกองสาธารณสุข/small>
+            <small class="text-muted">ระบบรายงานปฏิบัติงานของพนักงานกองสาธารณสุข</small>
         </div>
         
         <div class="user-box">
@@ -249,22 +249,33 @@
                         locText = `Lat: ${cachedLocation.lat.toFixed(6)}, Lng: ${cachedLocation.lng.toFixed(6)}`;
                     }
 
-                    const watermarkText = `วันที่ ${dateStr} ${timeStr} น. | พิกัด: ${locText}`;
+                    // 1. แยกข้อความเป็น 2 บรรทัด
+                    const line1 = `วันที่: ${dateStr} เวลา ${timeStr} น.`;
+                    const line2 = `พิกัด: ${locText}`;
 
-                    // วาดพื้นหลังสีดำ
-                    const barHeight = Math.max(45, height * 0.08); 
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                    // 2. ปรับขนาดฟอนต์ให้พอดี (อิงตามความกว้างรูป แต่ไม่เล็กกว่า 14px)
+                    const fontSize = Math.max(14, width * 0.035);
+                    
+                    // 3. คำนวณความสูงของแถบสีดำให้พอดีกับข้อความ 2 บรรทัด
+                    const padding = fontSize * 0.6; // ช่องไฟ
+                    const barHeight = (fontSize * 2) + (padding * 3); 
+
+                    // วาดแถบพื้นหลังสีดำกึ่งโปร่งใส
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
                     ctx.fillRect(0, height - barHeight, width, barHeight);
 
-                    // วาดข้อความ
-                    const fontSize = barHeight * 0.45;
+                    // 4. วาดข้อความ 2 บรรทัดที่มุมล่างซ้าย
                     ctx.fillStyle = '#ffffff';
-                    ctx.font = `bold ${fontSize}px sans-serif`;
+                    ctx.font = `500 ${fontSize}px 'Sarabun', sans-serif`;
                     ctx.textAlign = 'left';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(watermarkText, 15, height - (barHeight / 2));
+                    ctx.textBaseline = 'top';
 
-                    resolve(canvas.toDataURL('image/jpeg', 0.8)); 
+                    // วาดบรรทัดที่ 1
+                    ctx.fillText(line1, 15, height - barHeight + padding);
+                    // วาดบรรทัดที่ 2 (เว้นระยะลงมาตามความสูงตัวอักษรและช่องไฟ)
+                    ctx.fillText(line2, 15, height - barHeight + fontSize + (padding * 1.8));
+
+                    resolve(canvas.toDataURL('image/jpeg', 0.8));
                 };
             });
         }
