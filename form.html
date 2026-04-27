@@ -239,41 +239,32 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // --- ฝังลายน้ำ ---
+                   // --- ฝังลายน้ำ (เอาพิกัดออก เหลือแค่วันที่/เวลา) ---
                     const now = new Date();
                     const dateStr = now.toLocaleDateString('th-TH');
                     const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
 
-                    let locText = "รอสัญญาณ GPS...";
-                    if (cachedLocation) {
-                        locText = `Lat: ${cachedLocation.lat.toFixed(6)}, Lng: ${cachedLocation.lng.toFixed(6)}`;
-                    }
+                    const watermarkText = `วันที่: ${dateStr} เวลา ${timeStr} น.`;
 
-                    // 1. แยกข้อความเป็น 2 บรรทัด
-                    const line1 = `วันที่: ${dateStr} เวลา ${timeStr} น.`;
-                    const line2 = `พิกัด: ${locText}`;
-
-                    // 2. ปรับขนาดฟอนต์ให้พอดี (อิงตามความกว้างรูป แต่ไม่เล็กกว่า 14px)
+                    // ปรับขนาดฟอนต์ให้พอดีกับรูป
                     const fontSize = Math.max(14, width * 0.035);
                     
-                    // 3. คำนวณความสูงของแถบสีดำให้พอดีกับข้อความ 2 บรรทัด
-                    const padding = fontSize * 0.6; // ช่องไฟ
-                    const barHeight = (fontSize * 2) + (padding * 3); 
+                    // คำนวณความสูงของแถบสีดำให้พอดีกับข้อความ 1 บรรทัด
+                    const padding = fontSize * 0.6; 
+                    const barHeight = fontSize + (padding * 2); 
 
                     // วาดแถบพื้นหลังสีดำกึ่งโปร่งใส
                     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
                     ctx.fillRect(0, height - barHeight, width, barHeight);
 
-                    // 4. วาดข้อความ 2 บรรทัดที่มุมล่างซ้าย
+                    // วาดข้อความที่มุมล่างซ้าย
                     ctx.fillStyle = '#ffffff';
                     ctx.font = `500 ${fontSize}px 'Sarabun', sans-serif`;
                     ctx.textAlign = 'left';
-                    ctx.textBaseline = 'top';
-
-                    // วาดบรรทัดที่ 1
-                    ctx.fillText(line1, 15, height - barHeight + padding);
-                    // วาดบรรทัดที่ 2 (เว้นระยะลงมาตามความสูงตัวอักษรและช่องไฟ)
-                    ctx.fillText(line2, 15, height - barHeight + fontSize + (padding * 1.8));
+                    ctx.textBaseline = 'middle';
+                    
+                    // พิมพ์ข้อความบรรทัดเดียวตรงกึ่งกลางของแถบสีดำ
+                    ctx.fillText(watermarkText, 15, height - (barHeight / 2));
 
                     resolve(canvas.toDataURL('image/jpeg', 0.8));
                 };
