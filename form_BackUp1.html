@@ -15,8 +15,11 @@
         }
         body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 15px; color: var(--text-main); }
         .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 500px; margin: auto; border-top: 4px solid var(--primary); }
+        
+        /* สไตล์สำหรับโลโก้และ Header */
         .header { text-align: center; margin-bottom: 20px; }
-        .header h2 { color: var(--primary-dark); margin: 0; font-size: 1.4rem; }
+        .form-logo { width: 75px; height: 75px; object-fit: contain; margin-bottom: 12px; border-radius: 50%; background: white; padding: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header h2 { color: var(--primary-dark); margin: 0; font-size: 1.4rem; font-weight: bold;}
         
         .user-box { background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
         .status-loading { text-align: center; color: #64748b; font-weight: 600; font-size: 0.95rem; }
@@ -28,24 +31,35 @@
         input[type="text"]:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15); }
         input[readonly] { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; }
         
-        .image-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .img-slot { position: relative; aspect-ratio: 1; border: 2px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc; transition: all 0.2s; }
+        /* สไตล์กล่องรูปภาพอัพเดทใหม่ */
+        .image-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .img-slot { position: relative; border: 2px dashed #cbd5e1; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc; transition: all 0.2s; }
         .img-slot:hover { border-color: var(--primary); background: #f0fdf4; }
         .img-slot img { width: 100%; height: 100%; object-fit: cover; }
         .img-slot input { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2; }
-        .img-slot span { font-size: 0.8rem; color: #64748b; text-align: center; pointer-events: none; }
+        .img-slot span { font-size: 0.85rem; color: #64748b; text-align: center; pointer-events: none; padding: 10px; }
+        
+        .large-slot { aspect-ratio: 16/10; width: 100%; margin-bottom: 10px; }
+        .small-slot { aspect-ratio: 1; }
 
-        button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2); }
-        button:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-2px); }
-        button:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; color: #94a3b8; }
+        .btn-add-img { width: 100%; background: white; color: var(--primary); border: 2px dashed var(--primary); padding: 12px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.3s; margin-bottom: 20px; }
+        .btn-add-img:hover { background: #f0fdf4; }
+
+        .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2); }
+        .btn-submit:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; color: #94a3b8; }
         .loader { display: none; text-align: center; margin-top: 15px; font-size: 0.9rem; color: var(--primary-dark); font-weight: bold; }
+        /* สปินเนอร์ตอนโหลดรูป */
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin-bottom: 5px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="header">
+            <img src="https://img2.pic.in.th/pic/71f81565dc59a7f9545542493a5514ab.png" alt="โลโก้เทศบาล" class="form-logo">
             <h2>เทศบาลตำบลตันหยงมัส</h2>
-            <small class="text-muted">ระบบรายงานปฏิบัติงานชุมชน</small>
+            <small class="text-muted">ระบบรายงานปฏิบัติงานของพนักงานกองสาธารณสุข</small>
         </div>
         
         <div class="user-box">
@@ -63,27 +77,43 @@
         <label>รายละเอียดการปฏิบัติงาน (ระบุหรือไม่ก็ได้)</label>
         <textarea id="task" rows="3" placeholder="ระบุรายละเอียดงานที่ทำ... (ไม่บังคับ)"></textarea>
 
-        <label>รูปภาพประกอบ (สูงสุด 4 รูป)</label>
-        <div class="image-grid">
-            <div class="img-slot" id="slot-0"><span>📷 เพิ่มรูปที่ 1</span><input type="file" accept="image/*" onchange="processImage(this, 0)"></div>
-            <div class="img-slot" id="slot-1"><span>📷 เพิ่มรูปที่ 2</span><input type="file" accept="image/*" onchange="processImage(this, 1)"></div>
-            <div class="img-slot" id="slot-2"><span>📷 เพิ่มรูปที่ 3</span><input type="file" accept="image/*" onchange="processImage(this, 2)"></div>
-            <div class="img-slot" id="slot-3"><span>📷 เพิ่มรูปที่ 4</span><input type="file" accept="image/*" onchange="processImage(this, 3)"></div>
-        </div>
+        <label>รูปภาพประกอบ</label>
+        
+        <div id="imageContainer"></div>
 
-        <button id="btn" onclick="sendReport()" disabled>ส่งรายงาน</button>
+        <button type="button" id="addMoreImgBtn" class="btn-add-img" onclick="addMoreImageSlot()">
+            + เพิ่มเติมรูปภาพ (เหลืออีก 4 รูป)
+        </button>
+
+        <button id="btn" class="btn-submit" onclick="sendReport()" disabled>ส่งรายงาน</button>
         <div id="loader" class="loader">⏳ กำลังบีบอัดรูปและส่งข้อมูล...</div>
     </div>
 
     <script>
-        // อย่าลืมตรวจสอบ GAS_URL ให้ถูกต้อง
+        // รหัส Script ของคุณ
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbymBbVxK84pLkluL8SZ7QbbJ5RM-ewxnHUuxyTZmUDEJeWt2Jv5ZkFlPUnS7xmnu5rUJA/exec'; 
         const LIFF_ID = '2009731527-wia9Oe2M'; 
 
-        let images = [null, null, null, null];
+        let imagesArray = []; // เก็บรูปลง Array
         let lineUserId = "";
+        let cachedLocation = null;
+        const MAX_IMAGES = 5;
+
+        // ติดตาม GPS ทันทีที่โหลดหน้าเว็บ
+        function startTrackingLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(
+                    pos => { cachedLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }; },
+                    err => console.warn("รอสัญญาณ GPS..."),
+                    { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+                );
+            }
+        }
 
         async function init() {
+            startTrackingLocation();
+            addMoreImageSlot(); // วาดกล่องรูปที่ 1 ทันที
+
             try {
                 await liff.init({ liffId: LIFF_ID });
                 if (liff.isLoggedIn()) {
@@ -98,7 +128,7 @@
                 document.getElementById('loadingStatus').innerText = "❌ เกิดข้อผิดพลาดในการเชื่อมต่อ LINE";
             }
         }
-        init();
+        init(); // เรียกใช้งานทันที
 
         async function checkEmployeeFromDatabase(userId) {
             try {
@@ -115,7 +145,6 @@
                 if (data.found) {
                     loadingStatus.className = 'status-success';
                     loadingStatus.innerText = "✅ ยืนยันตัวตนสำเร็จ ✅";
-                    
                     empNameInput.value = data.name;
                     empAreaInput.value = data.area;
                     empNameInput.readOnly = true;
@@ -123,7 +152,6 @@
                 } else {
                     loadingStatus.className = 'status-warning';
                     loadingStatus.innerText = "👋 ยินดีต้อนรับ! กรุณากรอกข้อมูลเพื่อลงทะเบียนครั้งแรก 👋";
-                    
                     empNameInput.value = "";
                     empAreaInput.value = "";
                     empNameInput.readOnly = false;
@@ -138,20 +166,60 @@
             }
         }
 
+        // ---------- ระบบเพิ่มกล่องรูปภาพแบบไดนามิก ----------
+        function addMoreImageSlot() {
+            const container = document.getElementById('imageContainer');
+            const btn = document.getElementById('addMoreImgBtn');
+            const currentCount = container.querySelectorAll('.img-slot').length;
+
+            if (currentCount >= MAX_IMAGES) return;
+
+            const index = currentCount;
+            const slot = document.createElement('div');
+            slot.id = `slot-${index}`;
+            
+            // ไม่บังคับ capture="environment" ระบบจะถามเองว่ากล้อง/คลังภาพ
+            if (index === 0) {
+                slot.className = 'img-slot large-slot';
+                slot.innerHTML = `<span>📷 กดถ่ายรูปหรือเลือกรูปหลัก (1)</span><input type="file" accept="image/*" onchange="processImage(this, ${index})">`;
+                container.appendChild(slot);
+            } else {
+                let grid = document.getElementById('small-grid');
+                if (!grid) {
+                    grid = document.createElement('div');
+                    grid.id = 'small-grid';
+                    grid.className = 'image-grid';
+                    container.appendChild(grid);
+                }
+                slot.className = 'img-slot small-slot';
+                slot.innerHTML = `<span>📷 รูปที่ ${index + 1}</span><input type="file" accept="image/*" onchange="processImage(this, ${index})">`;
+                grid.appendChild(slot);
+            }
+
+            if (currentCount + 1 >= MAX_IMAGES) {
+                btn.style.display = 'none';
+            } else {
+                btn.innerText = `+ เพิ่มเติมรูปภาพ (เหลืออีก ${MAX_IMAGES - (currentCount + 1)} รูป)`;
+            }
+        }
+
         async function processImage(input, index) {
             if (input.files && input.files[0]) {
+                const slot = document.getElementById(`slot-${index}`);
+                slot.innerHTML = `<div class="spinner"></div><span style="color:var(--primary); font-weight:bold;">กำลังฝังลายน้ำ...</span>`;
+
                 const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = async (e) => {
-                    const base64 = await compressImage(e.target.result);
-                    document.getElementById(`slot-${index}`).innerHTML = `<img src="${base64}">`;
-                    images[index] = base64;
+                    const base64 = await compressAndWatermarkImage(e.target.result);
+                    slot.innerHTML = `<img src="${base64}">`;
+                    imagesArray[index] = base64;
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function compressImage(base64Str) {
+        function compressAndWatermarkImage(base64Str) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.src = base64Str;
@@ -160,6 +228,7 @@
                     const MAX_WIDTH = 1000; 
                     let width = img.width;
                     let height = img.height;
+                    
                     if (width > height) {
                         if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                     } else {
@@ -169,7 +238,35 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+
+                   // --- ฝังลายน้ำ (เอาพิกัดออก เหลือแค่วันที่/เวลา) ---
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('th-TH');
+                    const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+                    const watermarkText = `วันที่: ${dateStr} เวลา ${timeStr} น.`;
+
+                    // ปรับขนาดฟอนต์ให้พอดีกับรูป
+                    const fontSize = Math.max(14, width * 0.035);
+                    
+                    // คำนวณความสูงของแถบสีดำให้พอดีกับข้อความ 1 บรรทัด
+                    const padding = fontSize * 0.6; 
+                    const barHeight = fontSize + (padding * 2); 
+
+                    // วาดแถบพื้นหลังสีดำกึ่งโปร่งใส
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.fillRect(0, height - barHeight, width, barHeight);
+
+                    // วาดข้อความที่มุมล่างซ้าย
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `500 ${fontSize}px 'Sarabun', sans-serif`;
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    
+                    // พิมพ์ข้อความบรรทัดเดียวตรงกึ่งกลางของแถบสีดำ
+                    ctx.fillText(watermarkText, 15, height - (barHeight / 2));
+
+                    resolve(canvas.toDataURL('image/jpeg', 0.8));
                 };
             });
         }
@@ -180,11 +277,11 @@
             let task = document.getElementById('task').value.trim();
 
             if(!inputName || !inputArea) return alert('กรุณาระบุ ชื่อ-สกุล และ พื้นที่รับผิดชอบ');
-            
-            // หากไม่มีการกรอกรายละเอียดงาน ให้ใส่ขีด (-) เพื่อให้ข้อมูลในชีทดูเป็นระเบียบ
-            if(!task) {
-                task = "-";
-            }
+            if(!task) task = "-";
+
+            // กรองรูปภาพที่ถูกอัพโหลดจริงๆ
+            const uploadedImages = imagesArray.filter(img => img !== null && img !== undefined);
+            if(uploadedImages.length === 0) return alert('กรุณาแนบรูปภาพอย่างน้อย 1 รูปครับ');
 
             const btn = document.getElementById('btn');
             const loader = document.getElementById('loader');
@@ -192,41 +289,59 @@
             btn.disabled = true;
             loader.style.display = 'block';
 
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    const payload = {
-                        employeeName: inputName,
-                        employeeArea: inputArea,
-                        lineId: lineUserId,
-                        task: task,
-                        latitude: pos.coords.latitude,
-                        longitude: pos.coords.longitude,
-                        images: images.filter(img => img !== null)
-                    };
+            const submitData = (latitude, longitude) => {
+                const payload = {
+                    employeeName: inputName,
+                    employeeArea: inputArea,
+                    lineId: lineUserId,
+                    task: task,
+                    latitude: latitude,
+                    longitude: longitude,
+                    images: uploadedImages
+                };
 
-                    fetch(GAS_URL, { 
-                        method: 'POST', 
-                        mode: 'no-cors', 
-                        body: JSON.stringify(payload) 
-                    })
-                    .then(() => {
+                // ใช้ text/plain แจ้งให้ GAS ทราบเพื่อหลีกเลี่ยง CORS และช่วยให้อ่าน Response Error ได้
+                fetch(GAS_URL, { 
+                    method: 'POST', 
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8"
+                    },
+                    body: JSON.stringify(payload) 
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
                         alert('✅ ส่งรายงานสำเร็จ ขอบคุณครับ!');
                         liff.closeWindow();
-                    })
-                    .catch(err => {
-                        console.error('Fetch Error:', err);
-                        alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+                    } else {
+                        // ดักจับ Error จากฝั่ง Code.gs
+                        alert('❌ เกิดข้อผิดพลาดจากเซิร์ฟเวอร์: ' + data.message);
                         btn.disabled = false;
                         loader.style.display = 'none';
-                    });
-                },
-                err => {
-                    alert('กรุณาเปิด GPS และอนุญาตการเข้าถึงตำแหน่งก่อนส่งข้อมูลครับ');
+                    }
+                })
+                .catch(err => {
+                    console.error('Fetch Error:', err);
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
                     btn.disabled = false;
                     loader.style.display = 'none';
-                },
-                { enableHighAccuracy: true }
-            );
+                });
+            };
+
+            // หากมีพิกัดแคชไว้ ให้ส่งเลย ถ้าไม่มี ให้บังคับดึง ณ วินาทีนั้น
+            if (cachedLocation) {
+                submitData(cachedLocation.lat, cachedLocation.lng);
+            } else {
+                navigator.geolocation.getCurrentPosition(
+                    pos => submitData(pos.coords.latitude, pos.coords.longitude),
+                    err => {
+                        alert('กรุณาเปิด GPS และอนุญาตการเข้าถึงตำแหน่งก่อนส่งข้อมูลครับ');
+                        btn.disabled = false;
+                        loader.style.display = 'none';
+                    },
+                    { enableHighAccuracy: true }
+                );
+            }
         }
     </script>
 </body>
